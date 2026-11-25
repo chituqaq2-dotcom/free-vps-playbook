@@ -1,0 +1,27 @@
+# Oracle Always-Free A1 grabber. Capacity error => exit 0 (green), success => open an issue that @mentions you.
+name: grab
+on:
+  schedule: [{ cron: "*/20 * * * *" }]
+  workflow_dispatch:
+    inputs: { mode: { default: "a1" } }
+concurrency: { group: grab, cancel-in-progress: false }
+jobs:
+  grab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install oci
+      - name: loop every 5 min (~340 min)
+        env:
+          OCI_USER: ${{ secrets.OCI_USER }}
+          OCI_TENANCY: ${{ secrets.OCI_TENANCY }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_KEY: ${{ secrets.OCI_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ inputs.mode || 'a1' }}
+        run: |
+          for i in $(seq 1 68); do python grab.py && [ -f DONE ] && break; sleep 300; done
+# grab.py rules: never exceed 2 OCPU / 12 GB (A1 Always Free); skip if instance already exists;
+# boot volume total <= 200 GB; rebuild PEM header lines if the secret lost them.

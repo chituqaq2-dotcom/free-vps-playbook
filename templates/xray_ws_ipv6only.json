@@ -1,0 +1,50 @@
+{
+ "log": {
+  "loglevel": "warning"
+ },
+ "inbounds": [
+  {
+   "listen": "127.0.0.1",
+   "port": 10000,
+   "protocol": "vless",
+   "settings": {
+    "clients": [
+     {
+      "id": "<SECRET>"
+     }
+    ],
+    "decryption": "none"
+   },
+   "streamSettings": {
+    "network": "ws",
+    "wsSettings": {
+     "path": "<SECRET>"
+    }
+   },
+   "sniffing": {
+    "enabled": true,
+    "destOverride": [
+     "http",
+     "tls",
+     "quic"
+    ]
+   }
+  }
+ ],
+ "outbounds": [
+  {
+   "tag": "direct",
+   "protocol": "freedom",
+   "settings": {
+    "domainStrategy": "UseIPv6"
+   }
+  }
+ ],
+ "dns": {
+  "servers": [
+   "2a01:4f8:c2c:123f::1",
+   "2a00:1098:2b::1"
+  ],
+  "queryStrategy": "UseIPv6"
+ }
+}
