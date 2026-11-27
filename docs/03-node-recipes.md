@@ -38,3 +38,13 @@
 
 ## 上线验收（沙箱）
 `templates/nodetest.sh`：ip-api 出口归属（proxy/hosting 字段）、generate_204 冷/热中位数、10 MB 下载速度；再抽查 chatgpt.com / gemini.google.com / x.com / github.com 状态码。
+
+## D. SOCKS5 落地（链式）
+- 别人送的/薅来的 SOCKS5（静态 IP、商宽、“家宽”）在国内直连通常会被墙，必须**链式**：Clash/mihomo 里给 socks5 节点加 `dialer-proxy: <前置节点名>`，前置用一条国内连得上的加密节点（自己的 REALITY 机或 CF 优选 WS）。
+- base64（v2rayN/小火箭）格式表达不了链式，所以 SOCKS5 落地**只进 Clash 版**。
+- 前置选哪条以用户本地实测为准（沙箱在海外，延迟没有参考价值）。
+- 拿到 IP 先查两家以上的库（如 ip-api 的 proxy/hosting、proxycheck 的类型/风险分）。各家结论常打架，汇报时如实说“不保证是纯家宽”。论坛公开发的 IP 多人共用，不建议用来注册重要账号。
+
+## 不适合做节点的平台形态
+- 只给 HTTP 入口、且平台反代**缓冲整段响应**的（实测下行被憋 10 秒以上才吐出）：VLESS+WS/XHTTP 都走不通，加 `X-Accel-Buffering: no` 也没用。先用一个流式接口测一下再投入。
+- 闲置就休眠、只认外部访问唤醒的容器：内部跑程序保活无效（会被一起冻住）；外部定时 ping 能唤醒但往往按运行小时计额度。
